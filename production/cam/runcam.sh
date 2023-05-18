@@ -24,6 +24,7 @@ pcb2gcode \
     --mill-speed 24000 \
     --zero-start 1 \
     --pre-milling-gcode M7 \
+    --nog64 1 \
 \
     --drill ../*.drl \
     --zdrill -0.067 \
