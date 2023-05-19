@@ -1,7 +1,10 @@
 # NOTE: ignore 'CRITICAL... Unknown RS-274X...' output (or turn off X2 extensions in KiCAD gerber plot)
-# !! UNITS = INCHES !!
 
-usage() { echo "Usage: $(basename $0) [ -m <mirror-x-coordinate[in|mm]> ] <output-path>" 1>&2; exit 1; }
+# For two-sided PCBs I've found the easiest thing to do is set KiCAD's "Drill/Place File Origin" to
+# a cordinate on the horrizontal center of the PCB and use locator pins on the same line. This doesn't 
+# have to be precise but making it so helps greatly in checking the flipped allignment in a gcode viewer.
+
+usage() { echo "Usage: $(basename $0) [ -m <mirror-x-coordinate[in|]> ] <output-path>" 1>&2; exit 1; }
 MIRRORX="0.0000in"
 while getopts ':m:' OPTION; do
   case "$OPTION" in 
@@ -27,34 +30,39 @@ echo "Mirror X coordinate ${MIRRORX}"
 echo "OUTPUT PATH: ${OUTPUT_PATH}/"
 
 ZERO_START=0
-
-pcb2gcode \
+ARGS=( \ 
+    --metric 1 \
+    --metricoutput 1 \
     --ignore-warnings \
+    --nog64 1 \
+    --mirror-axis ${MIRRORX} \
+    --nom6 1 \
+    --zero-start ${ZERO_START} \
+) 
+PCB2GCODE="/usr/local/bin/pcb2gcode ${ARGS[@]}"
+
+${PCB2GCODE} \
     --voronoi 0 \
-    --zsafe 0.3mm \
-    --zchange 2in \
-    --drills-available 0.4mm 0.6mm 0.80mm 1.0mm \
-    --mill-diameters 0.1mm \
-    --cutter-diameter 2mm \
-    --isolation-width 0.3mm \
+    --zsafe 0.3 \
+    --zchange 50.0 \
+    --drills-available 0.4 0.5 0.6 0.7 0.80 0.9 1.0 1.1 1.2 1.3 1.4 1.5 \
+    --mill-diameters 0.1 \
+    --cutter-diameter 2 \
+    --isolation-width 0.3 \
     --zwork -0.002 \
     --mill-feed 800mm/min \
     --mill-vertfeed 320mm/min \
     --mill-speed 24000 \
     --pre-milling-gcode M7 \
-    --nog64 1 \
-    --mirror-axis ${MIRRORX} \
-    --nom6 1 \
-    --zero-start ${ZERO_START} \
 \
     --drill ../*.drl \
-    --zdrill -0.067 \
+    --zdrill -2.2 \
     --drill-feed 600mm/min \
     --drill-side front \
     --drill-speed 24000 \
-    --milldrill-diameter 2.0mm \
-    --min-milldrill-hole-diameter 2.2mm \
-    --zmilldrill -0.067 \
+    --milldrill-diameter 2.0 \
+    --min-milldrill-hole-diameter 2.0 \
+    --zmilldrill -1.7 \
     --drill-output ${OUTPUT_PATH}/1001_TOP_drilled-holes.nc \
     --milldrill-output ${OUTPUT_PATH}/1002_TOP_milled-holes.nc \
 \
@@ -66,29 +74,26 @@ pcb2gcode \
 \
     --outline ../*-Edge_Cuts.gbr \
     --cut-side back \
-    --zcut -0.067 \
+    --zcut -1.7 \
     --cut-feed 1080mm/min \
     --cut-vertfeed 320mm/min \
-    --cut-infeed 0.5mm \
+    --cut-infeed 0.5 \
     --cut-speed 24000 \
     --outline-output ${OUTPUT_PATH}/4001_BOTTOM-outline.nc \
 
 if [ $? != 0 ]; then exit $?; fi
 
-pcb2gcode \
-    --ignore-warnings \
-    --zsafe 0.3mm \
-    --zchange 2in \
-    --cutter-diameter 2mm \
-    --zero-start ${ZERO_START} \
-    --nog64 1 \
+${PCB2GCODE} \
+    --zsafe 3.0 \
+    --zchange 50 \
+    --cutter-diameter 2 \
 \
     --outline ../*-Edge_Cuts.gbr \
     --cut-side front \
-    --zcut 0.1 \
+    --zcut 2.0 \
     --cut-feed 1080mm/min \
     --cut-vertfeed 320mm/min \
-    --cut-infeed -0.1 \
+    --cut-infeed -2.0 \
     --cut-speed 24000 \
     --outline-output ${OUTPUT_PATH}/5001_TOP_CHECK-outline.nc
 
