@@ -26,6 +26,8 @@ fi
 echo "Mirror X coordinate ${MIRRORX}"
 echo "OUTPUT PATH: ${OUTPUT_PATH}/"
 
+ZERO_START=0
+
 pcb2gcode \
     --ignore-warnings \
     --voronoi 0 \
@@ -39,11 +41,11 @@ pcb2gcode \
     --mill-feed 800mm/min \
     --mill-vertfeed 320mm/min \
     --mill-speed 24000 \
-    --zero-start 1 \
     --pre-milling-gcode M7 \
     --nog64 1 \
     --mirror-axis ${MIRRORX} \
     --nom6 1 \
+    --zero-start ${ZERO_START} \
 \
     --drill ../*.drl \
     --zdrill -0.067 \
@@ -78,7 +80,7 @@ pcb2gcode \
     --zsafe 0.3mm \
     --zchange 2in \
     --cutter-diameter 2mm \
-    --zero-start 1 \
+    --zero-start ${ZERO_START} \
     --nog64 1 \
 \
     --outline ../*-Edge_Cuts.gbr \
