@@ -49,20 +49,20 @@ ${PCB2GCODE} \
     --mill-diameters 0.1 \
     --cutter-diameter 2 \
     --isolation-width 0.3 \
-    --zwork -0.002 \
-    --mill-feed 800mm/min \
-    --mill-vertfeed 320mm/min \
+    --zwork -0.05 \
+    --drill-feed 540mm/min \
+    --mill-feed 680mm/min \
+    --mill-vertfeed 120mm/min \
     --mill-speed 24000 \
     --pre-milling-gcode M7 \
 \
     --drill ../*.drl \
-    --zdrill -2.2 \
-    --drill-feed 600mm/min \
+    --zdrill -2.0 \
     --drill-side front \
     --drill-speed 24000 \
     --milldrill-diameter 2.0 \
     --min-milldrill-hole-diameter 2.0 \
-    --zmilldrill -1.7 \
+    --zmilldrill -1.6 \
     --drill-output ${OUTPUT_PATH}/1001_TOP_drilled-holes.nc \
     --milldrill-output ${OUTPUT_PATH}/1002_TOP_milled-holes.nc \
 \
@@ -74,28 +74,31 @@ ${PCB2GCODE} \
 \
     --outline ../*-Edge_Cuts.gbr \
     --cut-side back \
-    --zcut -1.7 \
-    --cut-feed 1080mm/min \
-    --cut-vertfeed 320mm/min \
-    --cut-infeed 0.5 \
+    --zcut -1.6 \
+    --cut-feed 880mm/min \
+    --cut-vertfeed 240mm/min \
+    --cut-infeed 0.4 \
     --cut-speed 24000 \
+    --bridges 1 \
+    --bridgesnum 2  \
+    --zbridges -1.2 \
     --outline-output ${OUTPUT_PATH}/4001_BOTTOM-outline.nc \
 
-if [ $? != 0 ]; then exit $?; fi
-
-${PCB2GCODE} \
-    --zsafe 3.0 \
-    --zchange 50 \
-    --cutter-diameter 2 \
-\
-    --outline ../*-Edge_Cuts.gbr \
-    --cut-side front \
-    --zcut 2.0 \
-    --cut-feed 1080mm/min \
-    --cut-vertfeed 320mm/min \
-    --cut-infeed -2.0 \
-    --cut-speed 24000 \
-    --outline-output ${OUTPUT_PATH}/5001_TOP_CHECK-outline.nc
-
-cat  ${OUTPUT_PATH}/4001_BOTTOM-outline.nc ${OUTPUT_PATH}/5001_TOP_CHECK-outline.nc > ${OUTPUT_PATH}/6001_ALLIGNMENT_CHECK-outline.nc
-
+# if [ $? != 0 ]; then exit $?; fi
+# 
+# ${PCB2GCODE} \
+#     --zsafe 3.0 \
+#     --zchange 50 \
+#     --cutter-diameter 2 \
+# \
+#     --outline ../*-Edge_Cuts.gbr \
+#     --cut-side front \
+#     --zcut 2.0 \
+#     --cut-feed 1080mm/min \
+#     --cut-vertfeed 320mm/min \
+#     --cut-infeed -2.0 \
+#     --cut-speed 24000 \
+#     --outline-output ${OUTPUT_PATH}/5001_TOP_CHECK-outline.nc
+# 
+# cat  ${OUTPUT_PATH}/4001_BOTTOM-outline.nc ${OUTPUT_PATH}/5001_TOP_CHECK-outline.nc > ${OUTPUT_PATH}/6001_ALLIGNMENT_CHECK-outline.nc
+# 
